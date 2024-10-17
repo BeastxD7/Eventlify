@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #2c3e50 !important;
+        }
+        .event-card {
+            background: #fff;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .event-card .card-body {
+            padding: 20px;
+        }
+        .event-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .event-details {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .btn-custom {
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #2980b9;
+            color: #fff;
+        }
+        .navbar-nav .nav-link {
+            color: #2c3e50;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'homepage' %}">Eventify</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'event_list' %}">Events</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'event_create' %}">Create Event</a>
+            </li>
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                </li>
+                <li class="nav-item" style="display: flex; align-items: center;">
+                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link btn btn-link" style="padding: 0; background: none; border: none;">Logout</button>
+                    </form>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <h2 class="mb-4">Your Registered Events</h2>
+    <div class="row">
+        {% for registration in registrations %}
+            <div class="col-md-6">
+                <div class="card event-card">
+                    <div class="card-body">
+                        <div class="event-name">{{ registration.event.name }}</div>
+                        <div class="event-details">
+                            <p><strong>Registered on:</strong> {{ registration.created_at }}</p>
+                            <p><strong>Email:</strong> {{ registration.email }}</p>
+                            <p><strong>Contact:</strong> {{ registration.contact }}</p>
+                        </div>
+                        <a href="{% url 'event_details' registration.event.name %}" class="btn btn-custom btn-block">View Event Details</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    You haven't registered for any events yet.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <a href="{% url 'event_list' %}" class="btn btn-custom mt-4">Back to Events</a>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

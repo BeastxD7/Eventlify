@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Eventify</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .hero {
+            background-image: url('https://www.feelsummerzante.com/wp-content/uploads/2024/02/zante-events-bg-1.png'); /* Placeholder image */
+            background-size: cover;
+            color: white;
+            text-align: center;
+            padding: 100px 0;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 1.5rem;
+        }
+        .features {
+            padding: 50px 0;
+        }
+        .feature-card {
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: scale(1.05);
+        }
+
+        .flex-center{
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'homepage' %}">Eventify</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto flex-center">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'event_list' %}">Events</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'event_create' %}">Create Event</a>
+            </li>
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link btn btn-link" style="padding: 0; background: none; border: none;">Logout</button>
+                    </form>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+
+<!-- Hero Section -->
+<div class="hero">
+    <div class="container">
+        <h1>Welcome to Eventify</h1>
+        <p>Your one-stop solution for managing events effortlessly!</p>
+        <a href="{% url 'event_list' %}" class="btn btn-primary btn-lg">Explore Events</a>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container features">
+    <h2 class="text-center mb-4">Our Features</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body">
+                    <h5 class="card-title">Browse Events</h5>
+                    <p class="card-text">Explore a variety of events happening around you and find what interests you the most.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body">
+                    <h5 class="card-title">Organize Your Own Events</h5>
+                    <p class="card-text">Create and manage your own events with ease. Our platform makes it simple and efficient.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body">
+                    <h5 class="card-title">Sign Up Easily</h5>
+                    <p class="card-text">Register for events with just a few clicks. Enjoy a smooth and user-friendly experience.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center py-4">
+    <p>&copy; {{ current_year }} Eventify. All rights reserved.</p>
+</footer>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
