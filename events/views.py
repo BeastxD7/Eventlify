@@ -1,16 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect,get_object_or_404
-from django.contrib.auth import login
-from django.contrib.auth.models import User
 from .forms import CustomUserCreationForm, EventRegistrationForm 
 from .models import Event,Registration
 from datetime import datetime
 
-def homepage(request):
-
 
 # Homepage view
+def homepage(request):
     return render(request, 'events/homepage.html', {'current_year': datetime.now().year})
 
 # Login view
@@ -29,6 +26,8 @@ def register_user(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'events/register.html', {'form': form})
+
+
 
 # Event list view
 def event_list(request):
@@ -49,16 +48,16 @@ def event_details(request, eventname):
 @login_required
 def event_create(request):
     if request.method == 'POST':
-        name = request.POST['name']
-        description = request.POST['description']
-        date = request.POST['date']  # This should match your model field
-        time = request.POST['time']  # This should match your model field
-        location = request.POST['location']
-        category = request.POST['category']
-        price = request.POST['price']
-        image = request.FILES.get('image')  # Use .get() for safety
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        location = request.POST.get('location')
+        category = request.POST.get('category')
+        price = request.POST.get('price')
+        image = request.FILES.get('image')
 
-        # Create the event object
+        # Create the event object and set the organizer to the current user
         event = Event(
             name=name,
             description=description,
@@ -67,13 +66,15 @@ def event_create(request):
             location=location,
             category=category,
             price=price,
-            image=image
+            image=image,
+            organizer=request.user  # Set the organizer
         )
         event.save()
 
         return redirect('event_list')  # Redirect to the event list or any other page
 
     return render(request, 'events/event_create.html')
+
 
 # Event registration view
 @login_required
@@ -137,3 +138,33 @@ def event_register(request, eventname):
 def dashboard(request):
     registrations = Registration.objects.filter(user=request.user)
     return render(request, 'events/dashboard.html', {'registrations': registrations})
+
+
+@login_required
+def event_dashboard(request):
+    # Get events hosted by the logged-in user
+    hosted_events = Event.objects.filter(organizer=request.user)
+    return render(request, 'events/event_dashboard.html', {'hosted_events': hosted_events})
+
+
+@login_required
+def event_stats(request, eventname):
+    # Get the specific event and its registrations
+    event = Event.objects.get(name=eventname, organizer=request.user)
+    registrations = Registration.objects.filter(event=event)
+    return render(request, 'events/event_stats.html', {'event': event, 'registrations': registrations})
+
+
+@login_required
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if event.organizer == request.user:
+        event.delete()
+        messages.success(request, "Event deleted successfully.")
+        return redirect('event_dashboard')
+    else:
+        messages.error(request, "You are not authorized to delete this event.")
+        return redirect('event_dashboard')
+    
+def developer_page(request):
+    return render(request, 'events/developers.html')

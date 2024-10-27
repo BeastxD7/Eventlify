@@ -3,6 +3,7 @@ from django.contrib.auth import views as auth_views
 from . import views
 from django.contrib.auth.views import LogoutView
 
+
 urlpatterns = [
     path('', views.homepage, name='homepage'),
     path('login/', auth_views.LoginView.as_view(template_name='events/login.html'), name='login'),
@@ -14,4 +15,8 @@ urlpatterns = [
     path('event-create/', views.event_create, name='event_create'),
     path('event-register/<str:eventname>/', views.event_register, name='event_register'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('event-dashboard/', views.event_dashboard, name='event_dashboard'),
+    path('event-dasHboard/<str:eventname>/', views.event_stats, name='event_stats'),
+    path('event/delete/<int:event_id>/', views.delete_event, name='delete_event'),
+    path('developer/', views.developer_page, name='developer_page'),
 ]

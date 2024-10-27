@@ -3,80 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Available Events</title>
+    <title>Available Events - Eventify</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #051236 0%, #040f33 50%, #05132a 100%);
+            --card-gradient: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            background: var(--primary-gradient);
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+
+        .event-card.glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-img-wrapper {
+            overflow: hidden;
+            border-radius: 0.75rem 0.75rem 0 0;
+        }
+
         .card-img-top {
-            height: 200px; /* Set a fixed height for images */
-            object-fit: cover; /* Ensure images cover the area without distortion */
+            transition: transform 0.5s ease;
+        }
+
+        .event-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .hero-animation {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{% url 'homepage' %}">Eventify</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto flex-center">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'event_list' %}">Events</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'event_create' %}">Create Event</a>
-                </li>
-                {% if user.is_authenticated %}
-                    <li class="nav-item" >
-                        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-                    </li>
-                    <li class="nav-item" style="display: flex;  align-items: center;">
-                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="nav-link btn btn-link" style=" padding: 0; background: none; border: none;">Logout</button>
-                        </form>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
-
-<div class="container mt-5">
-    <h2>Available Events</h2>
-    <div class="row">
-        {% for event in events %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                {% if event.image %}
-                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.name }}">
-                {% else %}
-                <img src="https://via.placeholder.com/150" class="card-img-top" alt="No image available">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ event.name }}</h5>
-                    <p class="card-text">Category: {{ event.category }}</p>
-                    <a href="{% url 'event_details' event.name %}" class="btn btn-info">View Details</a>
-                    <a href="{% url 'event_register' event.name %}" class="btn btn-primary">Register</a>
+<body class="min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-gray-900 bg-opacity-90 backdrop-filter backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'homepage' %}" class="text-2xl font-bold text-blue-400">Eventify</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="{% url 'event_list' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Events</a>
+                        <a href="{% url 'event_create' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Create Event</a>
+                        <a href="{% url 'event_dashboard' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Event Dashboard</a>
+                        {% if user.is_authenticated %}
+                            <form action="{% url 'logout' %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</button>
+                            </form>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                            <a href="{% url 'register' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button type="button" class="text-gray-300 hover:text-white focus:outline-none focus:text-white" id="mobile-menu-button">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12">
-            <p>No events available.</p>
+        <div class="hidden md:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="{% url 'event_list' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Events</a>
+                <a href="{% url 'event_create' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Create Event</a>
+                <a href="{% url 'event_dashboard' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Event Dashboard</a>
+                {% if user.is_authenticated %}
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium w-full text-left">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Login</a>
+                    <a href="{% url 'register' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Register</a>
+                {% endif %}
+            </div>
         </div>
-        {% endfor %}
-    </div>
-</div>
+    </nav>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Main Content -->
+    <div class="gradient-bg min-h-screen">
+        <div class="container mx-auto px-6 pt-24 pb-12">
+            <h2 class="text-4xl font-bold mb-8 hero-animation">
+                <i class="fas fa-calendar-alt mr-2"></i>Available Events
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for event in events %}
+                <div class="event-card glass-card rounded-xl overflow-hidden hero-animation">
+                    <div class="card-img-wrapper">
+                        <img src="{{ event.image.url }}" class="card-img-top w-full h-56 object-cover" alt="{{ event.name }}">
+                    </div>
+                    <div class="p-6">
+                        <h5 class="text-xl font-bold mb-2">{{ event.name }}</h5>
+                        <p class="text-gray-400 mb-4">
+                            <i class="fas fa-tag mr-2"></i>{{ event.category }}
+                        </p>
+                        <div class="flex space-x-3">
+                            <a href="{% url 'event_details' event.name %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition-all flex-1 text-center">
+                                <i class="fas fa-info-circle mr-2"></i>Details
+                            </a>
+                            <a href="{% url 'event_register' event.name %}" class="gradient-bg text-white px-4 py-2 rounded-full transition-all flex-1 text-center">
+                                <i class="fas fa-ticket-alt mr-2"></i>Register
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-12 glass-card rounded-xl hero-animation">
+                    <i class="fas fa-calendar-times text-4xl mb-4 text-gray-400"></i>
+                    <p class="text-xl">No events available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            var menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>
